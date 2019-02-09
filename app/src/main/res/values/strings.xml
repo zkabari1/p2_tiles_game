@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">2048</string>
+    <string name="toastTop">Top</string>
+    <string name="toastRight">Right</string>
+    <string name="toastLeft">Left</string>
+    <string name="toastBottom">Bottom</string>
+</resources>
