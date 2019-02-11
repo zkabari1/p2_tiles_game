@@ -1,15 +1,12 @@
 package com.example.a2048;
 
-import android.support.constraint.ConstraintLayout;
+import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.Random;
 
 public class GameScreen extends AppCompatActivity {
@@ -18,49 +15,143 @@ public class GameScreen extends AppCompatActivity {
         Button[] buttons = new Button[16];
         static Random r = new Random();
         int[][] tiles = new int[4][4];
+        @SuppressLint("ClickableViewAccessibility")
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_game_screen);
-            cleardata();
-            addRandomNum();
+            newgame();
             initializeSwipeArea();
+            MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.yoursong);
+            mediaPlayer.start();
 
             SwipeArea.setOnTouchListener(new OnSwipeTouchListener(GameScreen.this) {
                 public void onSwipeTop() {
+                    boolean flg = false;
+                    for (int j = 3; j > 0; j--) {
+                        for (int k = 0; k < 4; k++) {
+                            if (tiles[j][k] > 0 && tiles[j-1][k] == 0){
+                                tiles[j-1][k]=tiles[j][k];
+                                tiles[j][k]=0;
+                                flg=true;
+                            } if ((tiles[j][k] == tiles[j-1][k]) && tiles[j][k]!=0) {
+                                tiles[j-1][k] = tiles[j][k] + tiles[j-1][k];
+                                tiles[j][k] = 0;
+                                flg=true;
+                                break;
+                            }
+                        }
+                    }
+                    if(flg)
                     addRandomNum();
                 }
                 public void onSwipeRight() {
-                    addRandomNum();
-                }
-                public void onSwipeLeft() {
+                    boolean flg = false;
                     for (int j = 0; j < 4; j++) {
-                            for (int k = 3; k >=0 ; k--) {
-                                if(tiles[j][k] == 1 && tiles[j][k-1] == 0){
-                                    tiles[j][k-1] = tiles[j][k];
-                                    buttons[j*4 + k-1].setText(buttons[j*4 + k].getText());
-                                    tiles[j][k] = 0;
-                                    buttons[j*4 + k].setText("");
-                                }
+                        for (int k = 2; k >= 0; k--) {
+                            if (tiles[j][k] > 0 && tiles[j][k+1] == 0){
+                               tiles[j][k+1]=tiles[j][k];
+                               tiles[j][k]=0;
+                               flg = true;
+                            }  if ((tiles[j][k] == tiles[j][k+1]) && tiles[j][k]!=0) {
+                                tiles[j][k+1] = tiles[j][k] + tiles[j][k+1];
+                                tiles[j][k] = 0;
+                                flg=true;
+                                break;
                             }
                         }
-                    addRandomNum();
+                    }
+                    if(flg)
+                        addRandomNum();
+                }
+                public void onSwipeLeft() {
+                    boolean flg = false;
+                    for (int j = 0; j < 4; j++) {
+                        for (int k = 3; k > 0; k--) {
+                            if (tiles[j][k] > 0 && tiles[j][k-1] == 0){
+                                tiles[j][k-1] = tiles[j][k];
+                                tiles[j][k]=0;
+                                flg=true;
+                            }  if ((tiles[j][k] == tiles[j][k-1]) && tiles[j][k]!=0) {
+                                tiles[j][k-1] = tiles[j][k] + tiles[j][k-1];
+                                tiles[j][k] = 0;
+                                flg=true;
+                                break;
+                            }
+                        }
+                    }
+                    if(flg)
+                        addRandomNum();
                 }
                 public void onSwipeBottom() {
+                    boolean flg=false;
+                    for (int j = 0; j < 3; j++) {
+                        for (int k = 0; k < 4; k++) {
+                            if (tiles[j][k] > 0 && tiles[j+1][k] == 0){
+                                tiles[j+1][k] = tiles[j][k];
+                                tiles[j][k]=0;
+                                flg=true;
+                            }  if((tiles[j][k] == tiles[j+1][k]) && tiles[j][k]!=0) {
+                                tiles[j+1][k] = tiles[j][k] + tiles[j+1][k];
+                                tiles[j][k] = 0;
+                                flg=true;
+                                break;
+                            }
+                        }
+                    }
+                    if(flg)
                     addRandomNum();
                 }
             });
         }
-    private void initializeSwipeArea() {
+        private void initializeSwipeArea() {
         SwipeArea=(TextView) findViewById(R.id.SwipeArea);
         }
-        //clear data
-        private void  cleardata() {
+        //New Game
+        private void  newgame() {
+            for(int i=0;i<4;i++){
+                for(int j=0;j<4;j++){
+                    tiles[i][j]=0;
+                }
+            }
+            displaydata();
+            addRandomNum();
+        }
+
+        void displaydata(){
             for (int i = 0; i < 16; i++) {
+                int j=i/4;
+                int k=i%4;
                 String b_ID = "button" + i;
                 int ID = getResources().getIdentifier(b_ID, "id", getPackageName());
                 buttons[i] = ((Button) findViewById(ID));
-                buttons[i].setText("");
+                setvalue(i,tiles[j][k]);
+                switch (getvalue(i)) {
+                    case 2: buttons[i].setBackgroundColor(Color.parseColor("#0067b1"));
+                        buttons[i].setTextColor(Color.WHITE); break;
+                    case 4: buttons[i].setBackgroundColor(Color.parseColor("#35bfc0"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 8: buttons[i].setBackgroundColor(Color.parseColor("#6c8cb8"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 16: buttons[i].setBackgroundColor(Color.parseColor("#307e80"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 32: buttons[i].setBackgroundColor(Color.parseColor("#cc7770"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 64: buttons[i].setBackgroundColor(Color.parseColor("#3f512b"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 128: buttons[i].setBackgroundColor(Color.parseColor("#c21d5f"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 256: buttons[i].setBackgroundColor(Color.parseColor("#feb302"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 512: buttons[i].setBackgroundColor(Color.parseColor("#312545"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 1024: buttons[i].setBackgroundColor(Color.parseColor("#99a751"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    case 2048: buttons[i].setBackgroundColor(Color.parseColor("#a28cff"));
+                        buttons[i].setTextColor(Color.WHITE);break;
+                    default: buttons[i].setTextColor(Color.parseColor("#dee0e0"));
+                        buttons[i].setBackgroundColor(Color.parseColor("#dee0e0"));break;
+                }
             }
         }
         // Generate random tile
@@ -71,26 +162,22 @@ public class GameScreen extends AppCompatActivity {
             String b_ID = "button" + i;
             int ID = getResources().getIdentifier(b_ID, "id", getPackageName());
             buttons[i] = ((Button) findViewById(ID));
-            if(buttons[i].getText() == "") {
-                buttons[i].setText("2");
-                tiles[j][k] = 1;
-                switch (Integer.parseInt(buttons[i].getText().toString())) {
-                    case 2: buttons[i].setBackgroundColor(0xffeee4da); break;
-                    case 4: buttons[i].setBackgroundColor(0xffede0c8); break;
-                    case 8: buttons[i].setBackgroundColor(0xfff2b179); break;
-                    case 16: buttons[i].setBackgroundColor(0xfff59563); break;
-                    case 32: buttons[i].setBackgroundColor(0xfff67c5f); break;
-                    case 64: buttons[i].setBackgroundColor(0xfff65e3b); break;
-                    case 128: buttons[i].setBackgroundColor(0xffedcf72); break;
-                    case 256: buttons[i].setBackgroundColor(0xffedc750); break;
-                    case 512: buttons[i].setBackgroundColor(0xffedc850); break;
-                    case 1024: buttons[i].setBackgroundColor(0xffecc640); break;
-                   // default: lable.setBackgroundColor(0xffedc22d); break;
-                }
-
+            if(getvalue(i) == 0) {
+                tiles[j][k] = 2;
+                setvalue(i,tiles[j][k]);
+                displaydata();
             }
             else{
                 addRandomNum();
             }
+        }
+
+        int getvalue(int i){
+            return Integer.parseInt(buttons[i].getText().toString());
+        }
+
+        void setvalue(int i, int value){
+            String val = String.valueOf(value);
+            buttons[i].setText(val);
         }
 }
