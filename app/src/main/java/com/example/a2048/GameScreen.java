@@ -1,6 +1,7 @@
 package com.example.a2048;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
@@ -8,10 +9,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import java.util.Random;
 
 public class GameScreen extends AppCompatActivity {
@@ -21,9 +21,9 @@ public class GameScreen extends AppCompatActivity {
         static Random r = new Random();
         int[][] tiles = new int[4][4];
         int moves;
-        EditText countmoves;
+        TextView countmoves;
         String count;
-
+        boolean gameover=false;
 
      @SuppressLint("ClickableViewAccessibility")
         @Override
@@ -33,13 +33,13 @@ public class GameScreen extends AppCompatActivity {
             newgame();
             initializeSwipeArea();
 
+            //Media Player
             final MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.music3);
             mediaPlayer.setLooping(true);
             mediaPlayer.start();
-            Switch musicbtn = (Switch) findViewById(R.id.switch_music);
-            Boolean musicstate = musicbtn.isChecked();
-            Button newbtn = (Button) findViewById(R.id.button_newgame);
 
+            //Switch to on/off music
+            Switch musicbtn = (Switch) findViewById(R.id.switch_music);
             musicbtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
              @Override
              public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
@@ -52,17 +52,26 @@ public class GameScreen extends AppCompatActivity {
              }
          });
 
+        //New game
+         Button newbtn = (Button) findViewById(R.id.button_newgame);
          newbtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     newgame();
                 }
             });
-         countmoves=(EditText) findViewById(R.id.movesbtn);
-         count = String.valueOf(moves);
-         countmoves.setText(count);
 
-            SwipeArea.setOnTouchListener(new OnSwipeTouchListener(GameScreen.this) {
+         //End game
+         ImageButton endgame = (ImageButton) findViewById(R.id.imageButtonendgame);
+         endgame.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 gameover();
+             }
+         });
+
+         //Set SwipeArea Left, Top, Bottom and Right logic
+         SwipeArea.setOnTouchListener(new OnSwipeTouchListener(GameScreen.this) {
                 public void onSwipeTop() {
                     boolean flg = false;
                     for (int j = 3; j > 0; j--) {
@@ -81,6 +90,8 @@ public class GameScreen extends AppCompatActivity {
                     }
                     if(flg)
                     addRandomNum();
+                    else
+                        gameover=true;
                 }
                 public void onSwipeRight() {
                     boolean flg = false;
@@ -100,6 +111,8 @@ public class GameScreen extends AppCompatActivity {
                     }
                     if(flg)
                         addRandomNum();
+                    else
+                        gameover=true;
                 }
                 public void onSwipeLeft() {
                     boolean flg = false;
@@ -119,6 +132,8 @@ public class GameScreen extends AppCompatActivity {
                     }
                     if(flg)
                         addRandomNum();
+                    else
+                        gameover=true;
                 }
                 public void onSwipeBottom() {
                     boolean flg=false;
@@ -138,12 +153,21 @@ public class GameScreen extends AppCompatActivity {
                     }
                     if(flg)
                     addRandomNum();
+                    else
+                        gameover=true;
                 }
             });
+
+         //No moves available then game over
+        if(gameover)
+            gameover();
         }
+
+        //Set full screen swipe area
         private void initializeSwipeArea() {
         SwipeArea=(TextView) findViewById(R.id.SwipeArea);
         }
+
         //New Game
         private void  newgame() {
             moves=-1;
@@ -156,6 +180,7 @@ public class GameScreen extends AppCompatActivity {
             addRandomNum();
         }
 
+        //display tiles
         void displaydata(){
             for (int i = 0; i < 16; i++) {
                 int j=i/4;
@@ -192,6 +217,7 @@ public class GameScreen extends AppCompatActivity {
                 }
             }
         }
+
         // Generate random tile
         public void addRandomNum(){
 
@@ -206,19 +232,35 @@ public class GameScreen extends AppCompatActivity {
                 setvalue(i,tiles[j][k]);
                 displaydata();
                 moves++;
+                moveschanges(moves);
             }
             else{
                 addRandomNum();
             }
         }
 
+        //get value from button
         int getvalue(int i){
             return Integer.parseInt(buttons[i].getText().toString());
         }
 
+        //set value to button
         void setvalue(int i, int value){
             String val = String.valueOf(value);
             buttons[i].setText(val);
+     }
+
+        //display no of moves
+        void moveschanges(int moves) {
+            countmoves = (TextView) findViewById(R.id.movesbtn);
+            count = String.valueOf(moves);
+            countmoves.setText(count);
         }
 
-}
+        //gameover
+        void gameover(){
+            Intent gameover = new Intent(GameScreen.this, GameOver.class);
+            startActivity(gameover);
+            finish();
+            }
+    }
