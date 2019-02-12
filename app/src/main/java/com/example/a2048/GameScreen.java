@@ -5,8 +5,13 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
+
 import java.util.Random;
 
 public class GameScreen extends AppCompatActivity {
@@ -15,15 +20,47 @@ public class GameScreen extends AppCompatActivity {
         Button[] buttons = new Button[16];
         static Random r = new Random();
         int[][] tiles = new int[4][4];
-        @SuppressLint("ClickableViewAccessibility")
+        int moves;
+        EditText countmoves;
+        String count;
+
+
+     @SuppressLint("ClickableViewAccessibility")
         @Override
-        protected void onCreate(Bundle savedInstanceState) {
+        public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_game_screen);
             newgame();
             initializeSwipeArea();
-            MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.yoursong);
+
+            final MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.music3);
+            mediaPlayer.setLooping(true);
             mediaPlayer.start();
+            Switch musicbtn = (Switch) findViewById(R.id.switch_music);
+            Boolean musicstate = musicbtn.isChecked();
+            Button newbtn = (Button) findViewById(R.id.button_newgame);
+
+            musicbtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+             @Override
+             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                 if (!bChecked) {
+                    mediaPlayer.pause();
+                 } else {
+                     mediaPlayer.setLooping(true);
+                     mediaPlayer.start();
+                 }
+             }
+         });
+
+         newbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    newgame();
+                }
+            });
+         countmoves=(EditText) findViewById(R.id.movesbtn);
+         count = String.valueOf(moves);
+         countmoves.setText(count);
 
             SwipeArea.setOnTouchListener(new OnSwipeTouchListener(GameScreen.this) {
                 public void onSwipeTop() {
@@ -109,6 +146,7 @@ public class GameScreen extends AppCompatActivity {
         }
         //New Game
         private void  newgame() {
+            moves=-1;
             for(int i=0;i<4;i++){
                 for(int j=0;j<4;j++){
                     tiles[i][j]=0;
@@ -155,7 +193,8 @@ public class GameScreen extends AppCompatActivity {
             }
         }
         // Generate random tile
-        private void addRandomNum(){
+        public void addRandomNum(){
+
             int i = r.nextInt(16);
             int j = i/4;
             int k = i % 4;
@@ -166,6 +205,7 @@ public class GameScreen extends AppCompatActivity {
                 tiles[j][k] = 2;
                 setvalue(i,tiles[j][k]);
                 displaydata();
+                moves++;
             }
             else{
                 addRandomNum();
@@ -180,4 +220,5 @@ public class GameScreen extends AppCompatActivity {
             String val = String.valueOf(value);
             buttons[i].setText(val);
         }
+
 }
