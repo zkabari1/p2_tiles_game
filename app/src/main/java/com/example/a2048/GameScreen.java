@@ -74,17 +74,20 @@ public class GameScreen extends AppCompatActivity {
          SwipeArea.setOnTouchListener(new OnSwipeTouchListener(GameScreen.this) {
                 public void onSwipeTop() {
                     boolean flg = false;
-                    for (int j = 3; j > 0; j--) {
-                        for (int k = 0; k < 4; k++) {
-                            if (tiles[j][k] > 0 && tiles[j-1][k] == 0){
-                                tiles[j-1][k]=tiles[j][k];
-                                tiles[j][k]=0;
-                                flg=true;
-                            } if ((tiles[j][k] == tiles[j-1][k]) && tiles[j][k]!=0) {
-                                tiles[j-1][k] = tiles[j][k] + tiles[j-1][k];
-                                tiles[j][k] = 0;
+                    for (int k = 0; k < 4; k++) {
+                        for (int j = 0; j < 3; j++) {
+                            if ((tiles[j][k] == tiles[j+1][k]) && tiles[j][k]!=0) {
+                                tiles[j][k] = tiles[j][k] + tiles[j+1][k];
+                                tiles[j+1][k] = 0;
                                 flg=true;
                                 break;
+                            }
+                        }
+                        for (int j = 3; j > 0; j--) {
+                            if (tiles[j][k] > 0 && tiles[j - 1][k] == 0) {
+                                tiles[j - 1][k] = tiles[j][k];
+                                tiles[j][k] = 0;
+                                flg = true;
                             }
                         }
                     }
@@ -96,16 +99,19 @@ public class GameScreen extends AppCompatActivity {
                 public void onSwipeRight() {
                     boolean flg = false;
                     for (int j = 0; j < 4; j++) {
-                        for (int k = 2; k >= 0; k--) {
-                            if (tiles[j][k] > 0 && tiles[j][k+1] == 0){
-                               tiles[j][k+1]=tiles[j][k];
-                               tiles[j][k]=0;
-                               flg = true;
-                            }  if ((tiles[j][k] == tiles[j][k+1]) && tiles[j][k]!=0) {
+                        for(int k=2;k>=0;k--){
+                            if ((tiles[j][k] == tiles[j][k+1]) && tiles[j][k]!=0) {
                                 tiles[j][k+1] = tiles[j][k] + tiles[j][k+1];
                                 tiles[j][k] = 0;
                                 flg=true;
                                 break;
+                            }
+                        }
+                        for (int k = 0; k < 3; k++) {
+                            if (tiles[j][k] > 0 && tiles[j][k + 1] == 0) {
+                                tiles[j][k + 1] = tiles[j][k];
+                                tiles[j][k] = 0;
+                                flg = true;
                             }
                         }
                     }
@@ -117,16 +123,19 @@ public class GameScreen extends AppCompatActivity {
                 public void onSwipeLeft() {
                     boolean flg = false;
                     for (int j = 0; j < 4; j++) {
-                        for (int k = 3; k > 0; k--) {
-                            if (tiles[j][k] > 0 && tiles[j][k-1] == 0){
-                                tiles[j][k-1] = tiles[j][k];
-                                tiles[j][k]=0;
-                                flg=true;
-                            }  if ((tiles[j][k] == tiles[j][k-1]) && tiles[j][k]!=0) {
+                        for(int k=1;k<4;k++){
+                        if ((tiles[j][k] == tiles[j][k-1]) && tiles[j][k]!=0) {
                                 tiles[j][k-1] = tiles[j][k] + tiles[j][k-1];
                                 tiles[j][k] = 0;
                                 flg=true;
                                 break;
+                            }
+                        }
+                        for (int k = 3; k > 0; k--) {
+                            if (tiles[j][k] > 0 && tiles[j][k - 1] == 0) {
+                                tiles[j][k - 1] = tiles[j][k];
+                                tiles[j][k] = 0;
+                                flg = true;
                             }
                         }
                     }
@@ -137,17 +146,20 @@ public class GameScreen extends AppCompatActivity {
                 }
                 public void onSwipeBottom() {
                     boolean flg=false;
-                    for (int j = 0; j < 3; j++) {
-                        for (int k = 0; k < 4; k++) {
-                            if (tiles[j][k] > 0 && tiles[j+1][k] == 0){
-                                tiles[j+1][k] = tiles[j][k];
-                                tiles[j][k]=0;
-                                flg=true;
-                            }  if((tiles[j][k] == tiles[j+1][k]) && tiles[j][k]!=0) {
+                    for (int k = 0; k < 4; k++) {
+                        for (int j = 2; j >= 0 ; j--) {
+                            if((tiles[j][k] == tiles[j+1][k]) && tiles[j][k]!=0) {
                                 tiles[j+1][k] = tiles[j][k] + tiles[j+1][k];
                                 tiles[j][k] = 0;
                                 flg=true;
                                 break;
+                            }
+                        }
+                        for (int j = 0; j < 3; j++) {
+                            if (tiles[j][k] > 0 && tiles[j + 1][k] == 0) {
+                                tiles[j + 1][k] = tiles[j][k];
+                                tiles[j][k] = 0;
+                                flg = true;
                             }
                         }
                     }
